@@ -1,4 +1,3 @@
-
 import { _decorator, Component, easing, instantiate, Node, Prefab, Quat, tween, v3, Vec3 } from "cc";
 import { addCard } from "./addCard";
 const { ccclass, property } = _decorator;
@@ -20,7 +19,6 @@ export class Infiniteanimation extends Component {
     createCards() {
         for (let i = 0; i < 7; i++) {
             const cardInstance = instantiate(this.cardPrefab);
-            // this.node.addChild(cardInstance);
             if (i % 2 == 0) {
                 cardInstance.setPosition(new Vec3(-750 + i * 180, 0, 0));
             } else {
@@ -31,71 +29,48 @@ export class Infiniteanimation extends Component {
         }
     }
 
-    async startInfiniteAnimation() {
-        let quat: Quat = new Quat();
-        Quat.fromEuler(quat, 0, -180, 0);
+    startInfiniteAnimation() {
         let currentCardIndex = 0;
 
-        const animateNextCard = (index) => {
+        const animateNextCard = () => {
             const card = this.cardNodes[currentCardIndex];
             this.node.addChild(card);
-            const firstX = card.position.x;
+
             tween(card)
-                .to(1, { scale: v3(1, 1, 0) }, { easing: "backOut" })
-                .to(1.5, { scale: v3(0.1, 0.1, 0) }, { easing: "backIn" })
+                .to(0.07, { scale: v3(0, 0, 0) }, { easing: "backIn" })
+                .to(0.14, { scale: v3(1, 1, 0) }, { easing: "backOut" })
+                .to(0.21, { scale: v3(0.1, 0.1, 0) }, { easing: "backIn" })
                 .call(() => {
                     if (currentCardIndex % 2 == 0) card.getComponent(addCard).setCard();
                 })
-                .to(2, { scale: v3(1, 1, 0) }, { easing: "backOut" })
+                .to(0.28, { scale: v3(1, 1, 0) }, { easing: "backOut" })
 
                 .call(() => {
                     console.log("call function called");
                     currentCardIndex = (currentCardIndex + 1) % this.cardNodes.length;
+                    if (currentCardIndex !== 0) animateNextCard();
+                    if (currentCardIndex == this.cardNodes.length - 1) {
+                        for (let i = this.cardNodes.length - 1; i >= 0; i--) {
+                            const card = this.cardNodes[i];
 
-                    animateNextCard(currentCardIndex);
+                            setTimeout(() => {
+                                tween(card)
+                                    .to(1, { scale: v3(0.1, 0.1, 0) }, { easing: "backIn" })
+                                    .call(() => {
+                                        this.node.removeChild(card);
+                                    })
+                                    .start();
+                            }, 3500 - i * 500);
+                            setTimeout(() => {
+                                this.startInfiniteAnimation();
+                            }, 4000);
+                        }
+                    }
                 })
-                // .to(0.5, { scale: v3(0.1, 0.1, 0) }, { easing: "backIn" })
-                // .call(() => {
-                //     card.removeFromParent();
-                // })
 
                 .start();
         };
 
-        animateNextCard(currentCardIndex);
+        animateNextCard();
     }
-
-    // startInfiniteAnimation() {
-    //     let currentCardIndex = 0;
-    //     const animateNextCard = () => {
-    //         const card = this.cardNodes[currentCardIndex];
-    //         this.node.addChild(card);
-    //         this.comingAnimation(card);
-    //         this.flipAnimation(card);
-    //         // tween(card)
-    //         //     .to(0.7, {}, { easing: "bounceOut" })
-    //         //     .to(0.7, {}, { easing: "bounceIn" })
-    //         //     .call(() => {
-    //         currentCardIndex = (currentCardIndex + 1) % this.cardNodes.length;
-    //         if (currentCardIndex !== 0) {
-    //             animateNextCard();
-    //         }
-    //         // })
-    //         // .repeatForever()
-    //         // .start();
-    //     };
-    //     animateNextCard();
-    // }
-
-    changeScale(card: Node) {
-        return new Promise((resolve, reject) => {});
-    }
-
-    // comingAnimation(card: Node) {
-    //     return new Promise
-    //     tween(card).to(0.7, {}, { easing: "bounceInOut" });
-    // }
-    // flipAnimation(card: Node) {
-    //     tween(card).to(0.7, {}, { easing: "bounceOutIn" });
-    // }
 }
