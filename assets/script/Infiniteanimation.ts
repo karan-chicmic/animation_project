@@ -26,6 +26,8 @@ export class Infiniteanimation extends Component {
         this.node.addChild(card);
         currentCardIndex = (currentCardIndex + 1) % this.cardNodes.length;
         if (currentCardIndex % 2 == 0) {
+            // a.then(resolve()).then(b.then(resolveSecond()));
+
             this.changeScale(card)
                 .catch()
                 .then(() => {
@@ -46,13 +48,11 @@ export class Infiniteanimation extends Component {
                 .catch();
         }
     }
-    changeCardFace(card: Node, currentCardIndex: number) {
+    changeCardFace(card: Node, currentCardIndex: number): Promise<unknown> {
         console.log("change card face");
         return new Promise((resolve, reject) => {
             resolve = () => {
-                if (currentCardIndex !== 0) {
-                    if (currentCardIndex % 2 == 0) card.getComponent(addCard).setCard();
-                }
+                if (currentCardIndex % 2 == 0) card.getComponent(addCard).setCard();
             };
             reject = () => {
                 console.log("reject of change card face");
@@ -60,7 +60,7 @@ export class Infiniteanimation extends Component {
         });
     }
 
-    flipCard(card: Node) {
+    flipCard(card: Node): Promise<unknown> {
         console.log("flip card");
         return new Promise((resolve, reject) => {
             resolve = () => {
@@ -90,7 +90,7 @@ export class Infiniteanimation extends Component {
         }
         console.log(this.cardNodes.length);
     }
-    changeScale(card: Node) {
+    changeScale(card: Node): Promise<unknown> {
         console.log("change scale");
         return new Promise((resolve, reject) => {
             resolve = () => {
